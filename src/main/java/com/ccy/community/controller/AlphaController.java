@@ -1,16 +1,22 @@
 package com.ccy.community.controller;
 
 import com.ccy.community.service.AlphaService;
+import com.ccy.community.util.CommuntiyUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/alpha")
@@ -126,4 +132,46 @@ public class AlphaController {
         list.add(emp);
         return list;
     }
+
+    //cookie演示
+    @RequestMapping(path = "/cookie/set", method = RequestMethod.GET)
+    @ResponseBody //返回json
+    public String setCookie(HttpServletResponse response) {
+        // 创建cookie
+        Cookie cookie = new Cookie("code", CommuntiyUtil.generateUUID());
+        // 设置cookie生效范围
+        cookie.setPath("/community/alpha");
+        // 设置cookie生存时间，单位是秒，默认关掉浏览器就结束
+        cookie.setMaxAge(60 * 10);
+        response.addCookie(cookie);
+        return "cookie test";
+    }
+
+    // session
+    @RequestMapping(path = "/session/set", method = RequestMethod.GET)
+    @ResponseBody           // springmvc自动添加session
+    public String setSession(HttpSession session) {
+        session.setAttribute("id", 1);
+        session.setAttribute("name", "ccy");
+        return "session";
+    }
+
+    @RequestMapping(path = "/session/get", method = RequestMethod.GET)
+    @ResponseBody
+    public String getSession(HttpSession session) {
+        System.out.println(session.getId());
+        System.out.println(session.getAttribute("id"));
+        System.out.println(session.getAttribute("name"));
+        return "get session";
+    }
+
+    // ajax示例
+    @RequestMapping(path = "/ajax", method = RequestMethod.POST)
+    @ResponseBody
+    public String testAjax(String name, int age) {
+        System.out.println(name);
+        System.out.println(age);
+        return CommuntiyUtil.getJSONString(0, "操作成功");
+    }
+
 }
